@@ -50,6 +50,11 @@ export interface ReducedTransformOptions extends CallerTransformOptions {
   instrument: boolean;
 }
 
+export interface RequireAndTranspileModuleOptions
+  extends ReducedTransformOptions {
+  applyInteropRequireDefault: boolean;
+}
+
 export type StringMap = Map<string, string>;
 
 export interface TransformOptions<OptionType = unknown>
@@ -63,9 +68,9 @@ export interface TransformOptions<OptionType = unknown>
   transformerConfig: OptionType;
 }
 
-export interface Transformer<OptionType = unknown> {
+export interface SyncTransformer<OptionType = unknown> {
   canInstrument?: boolean;
-  createTransformer?: (options?: OptionType) => Transformer;
+  createTransformer?: (options?: OptionType) => SyncTransformer<OptionType>;
 
   getCacheKey?: (
     sourceText: string,
@@ -73,9 +78,54 @@ export interface Transformer<OptionType = unknown> {
     options: TransformOptions<OptionType>,
   ) => string;
 
+  getCacheKeyAsync?: (
+    sourceText: string,
+    sourcePath: Config.Path,
+    options: TransformOptions<OptionType>,
+  ) => Promise<string>;
+
   process: (
     sourceText: string,
     sourcePath: Config.Path,
     options: TransformOptions<OptionType>,
   ) => TransformedSource;
+
+  processAsync?: (
+    sourceText: string,
+    sourcePath: Config.Path,
+    options: TransformOptions<OptionType>,
+  ) => Promise<TransformedSource>;
 }
+
+export interface AsyncTransformer<OptionType = unknown> {
+  canInstrument?: boolean;
+  createTransformer?: (options?: OptionType) => AsyncTransformer<OptionType>;
+
+  getCacheKey?: (
+    sourceText: string,
+    sourcePath: Config.Path,
+    options: TransformOptions<OptionType>,
+  ) => string;
+
+  getCacheKeyAsync?: (
+    sourceText: string,
+    sourcePath: Config.Path,
+    options: TransformOptions<OptionType>,
+  ) => Promise<string>;
+
+  process?: (
+    sourceText: string,
+    sourcePath: Config.Path,
+    options: TransformOptions<OptionType>,
+  ) => TransformedSource;
+
+  processAsync: (
+    sourceText: string,
+    sourcePath: Config.Path,
+    options: TransformOptions<OptionType>,
+  ) => Promise<TransformedSource>;
+}
+
+export type Transformer<OptionType = unknown> =
+  | SyncTransformer<OptionType>
+  | AsyncTransformer<OptionType>;

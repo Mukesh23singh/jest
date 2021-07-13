@@ -98,7 +98,6 @@ export default class CoverageReporter extends BaseReporter {
             maxCols: process.stdout.columns || Infinity,
             ...additionalOptions,
           })
-          // @ts-expect-error
           .execute(reportContext);
       });
       aggregatedResults.coverageMap = map;
@@ -236,9 +235,11 @@ export default class CoverageReporter extends BaseReporter {
         thresholds: Config.CoverageThresholdValue,
         actuals: istanbulCoverage.CoverageSummaryData,
       ) {
-        return (['statements', 'branches', 'lines', 'functions'] as Array<
-          keyof istanbulCoverage.CoverageSummaryData
-        >).reduce<Array<string>>((errors, key) => {
+        return (
+          ['statements', 'branches', 'lines', 'functions'] as Array<
+            keyof istanbulCoverage.CoverageSummaryData
+          >
+        ).reduce<Array<string>>((errors, key) => {
           const actual = actuals[key].pct;
           const actualUncovered = actuals[key].total - actuals[key].covered;
           const threshold = thresholds[key];
